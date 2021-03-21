@@ -1,0 +1,126 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+
+  --button-0: #9aaadd;
+  --button-1: #ee6a6d;
+  --button-2: #d394be;
+  --button-3: #3cddc7;
+}
+
+* {
+  font-family: monospace;
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+}
+
+.game {
+  display: flex;
+  justify-content: space-around;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#player1 {
+  color: var(--button-0);
+}
+#player2 {
+  color: var(--button-1);
+}
+#player3 {
+  color: var(--button-2);
+}
+#player4 {
+  color: var(--button-3);
+}
+
+.buttons {
+  width: 7rem;
+  height: 7rem;
+  position: relative;
+}
+
+.button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid #cecece5c;
+  box-shadow: inset 0px 0px 2px;
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.button-0 {
+  left: calc(50% - 1.25rem);
+  bottom: 0;
+}
+
+.button-1 {
+  right: 0;
+  top: calc(50% - 1.25rem);
+}
+
+.button-2 {
+  left: 0;
+  top: calc(50% - 1.25rem);
+}
+
+.button-3 {
+  left: calc(50% - 1.25rem);
+  top: 0;
+}
+
+.button-0.pressed {
+  background-color: var(--button-0);
+}
+
+.button-1.pressed {
+  background-color: var(--button-1);
+}
+
+.button-2.pressed {
+  background-color: var(--button-2);
+}
+
+.button-3.pressed {
+  background-color: var(--button-3);
+}
+
+.level {
+  width: 10rem;
+  height: 2rem;
+  border: 2px solid #cecece5c;
+  box-shadow: inset 0px 0px 2px;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.level > div {
+  width: 0%;
+  height: 100%;
+}
+
+#player1 .level > div {
+  background-color: var(--button-0);
+}
+
+#player2 .level > div {
+  background-color: var(--button-1);
+}
+
+#player3 .level > div {
+  background-color: var(--button-2);
+}
+
+#player4 .level > div {
+  background-color: var(--button-3);
+}
