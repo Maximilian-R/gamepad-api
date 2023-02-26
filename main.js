@@ -33,6 +33,8 @@ const gameLoop = () => {
         buttonNodes[i].classList.remove("pressed");
       }
     }
+
+    level.render();
   });
   requestAnimationFrame(gameLoop);
 };
@@ -91,7 +93,9 @@ const createLevel = (node) => {
       if (this.value < 0) {
         this.value = 0;
       }
-      node.style = `width: ${this.percent()}%;`;
+    },
+    render() {
+        node.style = `width: ${this.percent()}%;`;
     },
     pressed() {
       this.value += 5;
