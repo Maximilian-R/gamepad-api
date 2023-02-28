@@ -1,7 +1,36 @@
+const CONTROLLER = {
+  BUTTONS: {
+    CROSS: 0,
+    CIRCLE: 1,
+    SQUARE: 2,
+    TRIANGLE: 3,
+    L1: 4,
+    R1: 5,
+    L2: 6,
+    R2: 7,
+    CREATE: 8,
+    OPTIONS: 9,
+    L3: 10,
+    R3: 11,
+    UP: 12,
+    DOWN: 13,
+    LEFT: 14,
+    RIGHT: 15,
+    TOUCHPAD: 16,
+  },
+  AXES: {
+    LX: 0,
+    LY: 1,
+    RX: 2,
+    RY: 3,
+  },
+};
+
 class GamePadComponent extends HTMLElement {
   constructor() {
     super();
 
+    this.gamepad;
     this.cachedButtons = {};
     this.focusedElement;
     this.focusIndex = -1;
@@ -56,51 +85,60 @@ class GamePadComponent extends HTMLElement {
     }
     this.focusedElement = elements[this.focusIndex];
     this.focusedElement?.focus({ focusVisible: true });
-
-    console.debug(elements[this.focusIndex]);
   }
 
   click() {
     this.focusedElement?.click();
   }
 
+  isPressed(index) {
+    return (
+      this.gamepad.buttons[index].pressed && this.cachedButtons[index] !== true
+    );
+  }
+
+  isPushed(axis) {
+    const axisValue = (index) =>
+      Math.abs(this.gamepad.axes[index]) > 0.05
+        ? this.gamepad.axes[index] * 10
+        : 0;
+
+    if (typeof axis === "number") {
+      return axisValue(axis);
+    } else {
+      Object.keys(axis).map((key) => axisValue(axis[key]));
+    }
+  }
+
   input() {
-    const gamepad = navigator.getGamepads()[0];
-    const pressedButtons = { ...gamepad.buttons.map((b) => b.pressed) };
-    const left = gamepad.buttons[14];
-    const right = gamepad.buttons[15];
-    const x = gamepad.buttons[0];
-
-    // console.log(gamepad.axes);
-
-    if (left.pressed && this.cachedButtons[14] !== true) {
+    if (this.isPressed(CONTROLLER.BUTTONS.LEFT)) {
       this.tab(false);
     }
-    if (right.pressed && this.cachedButtons[15] !== true) {
+    if (this.isPressed(CONTROLLER.BUTTONS.RIGHT)) {
       this.tab(true);
     }
-    if (x.pressed && this.cachedButtons[0] !== true) {
+    if (this.isPressed(CONTROLLER.BUTTONS.CROSS)) {
       this.click();
     }
+    if (this.isPressed(CONTROLLER.BUTTONS.L1)) {
+      history.back();
+    }
+    if (this.isPressed(CONTROLLER.BUTTONS.R1)) {
+      history.forward();
+    }
 
-    this.cachedButtons = pressedButtons;
+    this.cursor.x += this.isPushed(CONTROLLER.AXES.LX);
+    this.cursor.y += this.isPushed(CONTROLLER.AXES.LY);
+    scrollBy(this.isPushed(CONTROLLER.AXES.RX), 0);
+    scrollBy(0, this.isPushed(CONTROLLER.AXES.RX));
 
-    const xAxis = gamepad.axes[0];
-    const yAxis = gamepad.axes[1];
-    const xScrollAxis = gamepad.axes[2];
-    const yScrollAxis = gamepad.axes[3];
+    if (this.isPushed(CONTROLLER.AXES)) {
+      if (this.cursor.x > window.innerWidth) this.cursor.x = window.innerWidth;
+      if (this.cursor.x < 0) this.cursor.x = 0;
+      if (this.cursor.y > window.innerHeight)
+        this.cursor.y = window.innerHeight;
+      if (this.cursor.y < 0) this.cursor.y = 0;
 
-    if (Math.abs(xAxis) > 0.05) this.cursor.x += xAxis * 10;
-    if (Math.abs(yAxis) > 0.05) this.cursor.y += yAxis * 10;
-    if (Math.abs(xScrollAxis) > 0.05) scrollBy(xScrollAxis * 10, 0);
-    if (Math.abs(yScrollAxis) > 0.05) scrollBy(0, yScrollAxis * 10);
-
-    if (
-      Math.abs(xAxis) > 0.05 ||
-      Math.abs(yAxis) > 0.05 ||
-      Math.abs(xScrollAxis) > 0.05 ||
-      Math.abs(yScrollAxis) > 0.05
-    ) {
       const prevElement = this.focusedElement;
       const elementAtCursor = document.elementFromPoint(
         this.cursor.x,
@@ -116,7 +154,10 @@ class GamePadComponent extends HTMLElement {
   }
 
   loop() {
+    this.gamepad = navigator.getGamepads()[0];
+    const pressedButtons = { ...this.gamepad.buttons.map((b) => b.pressed) };
     this.input();
+    this.cachedButtons = pressedButtons;
 
     this.cursorElement.style.top = `${this.cursor.y}px`;
     this.cursorElement.style.left = `${this.cursor.x}px`;
